@@ -175,4 +175,91 @@ public class ManagerTest {
             }
         }
     }
+    
+  //Mecz
+
+    @Test
+    public void addMeczCheck() {
+        manager.addStadion(stadion);
+        Long meczId = manager.addMecz(mecz);
+
+        Mecz retrievedMecz = manager.getMeczById(meczId);
+
+        assertEquals(meczNazwa1, retrievedMecz.getMeczNazwa());
+        assertEquals(meczCena1, retrievedMecz.getMeczCena(), 0);
+        assertEquals(stadion, retrievedMecz.getStadion());
+        assertEquals(true, retrievedMecz.getIsDelivered());
+    }
+
+    @Test
+    public void getAllMeczeCheck() {
+        List<Mecz> mecze = manager.getAllMecze();
+        int count = mecze.size();
+        manager.addStadion(stadion);
+        manager.addMecz(mecz);
+        mecze = manager.getAllMecze();
+        assertEquals(count+1, mecze.size());
+    }
+
+    @Test
+    public void deleteMeczCheck() {
+        manager.addStadion(stadion);
+        manager.addMecz(mecz);
+        int count = manager.getAllMecze().size();
+        manager.deleteMecz(mecz);
+        assertEquals(count-1, manager.getAllMecze().size());
+        assertNull(manager.getMeczById(mecz.getId()));
+    }
+
+    @Test
+    public void getMeczeByIdCheck() {
+        manager.addStadion(stadion);
+        Long id = manager.addMecz(mecz);
+        Mecz mecz = manager.getMeczById(id);
+        assertEquals(id, mecz.getId());
+        assertEquals(meczNazwa1, mecz.getMeczNazwa());
+        assertEquals(meczCena1, mecz.getMeczCena(), 0);
+        assertEquals(true, mecz.getIsDelivered());
+    }
+
+    @Test
+    public void getDeliveredMeczCheck() {
+        int count = manager.getDeliveredMecz().size();
+        manager.addStadion(stadion);
+        manager.addMecz(mecz);
+        assertEquals(count + 1, manager.getDeliveredMecz().size());
+        List<Mecz> deliveredMecze = manager.getDeliveredMecz();
+        for(Mecz mecz : deliveredMecze)
+            assertEquals(true, mecz.getIsDelivered());
+    }
+
+    @Test
+    public void getMeczeByStadionCheck() {
+        List<Mecz> mecze = new ArrayList<Mecz>();
+        mecze.add(mecz);
+        stadion.setMecze(mecze);
+        manager.addStadion(stadion);
+
+        List<Mecz> retrievedMecze = manager.getMeczeByStadion(stadion);
+        assertEquals(1, retrievedMecze.size());
+    }
+
+    @Test
+    public void updateMeczCheck() {
+        manager.addStadion(stadion);
+        manager.addMecz(mecz);
+        manager.updateMecz(mecz, meczNazwa2, meczCena2, true, stadion);
+        assertEquals(meczNazwa2, mecz.getMeczNazwa());
+        assertEquals(meczCena2, mecz.getMeczCena(), 0);
+        assertEquals(true, mecz.getIsDelivered());
+        assertEquals(stadion, mecz.getStadion());
+
+        List<Mecz> mecze = manager.getAllMecze();
+        for(Mecz m : mecze)
+            if (!m.equals(mecz)) {
+                assertThat(m.getMeczNazwa(), is(not(meczNazwa2)));
+                assertThat((m.getMeczCena()), is(not(meczCena2)));
+                assertThat(m.getStadion(), is(not(stadion)));
+            }
+    }
 }
