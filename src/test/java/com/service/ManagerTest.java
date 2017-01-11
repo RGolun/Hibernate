@@ -108,4 +108,71 @@ public class ManagerTest {
         assertEquals(count-1, manager.getAllStadiony().size());
         assertNull(manager.getStadionById(stadion.getStadionId()));
     }  
+    
+    @Test
+    public void getStadionyByIdCheck() {
+        Long id = manager.addStadion(stadion);
+        Stadion stadion = manager.getStadionById(id);
+        assertEquals(id, stadion.getStadionId());
+        assertEquals(stadionNazwa1, stadion.getStadionNazwa());
+        assertEquals(stadionKraj1, stadion.getStadionKraj());
+    }
+
+    @Test
+    public void getStadionyByKrajCheck() {
+        List<Stadion> stadiony = manager.getAllStadiony();
+        manager.addStadion(stadion);
+        String kraj = "Kraj";
+        int count = 0;
+
+        for(Stadion s : stadiony) {
+            if(Pattern.compile(".*" + kraj + ".*").matcher(manager.getStadionById(s.getStadionId()).getStadionKraj()).matches())
+                count++;
+        }
+        stadiony = manager.getStadionByKraj(kraj);
+        assertEquals(stadiony.size(), count + 1);
+
+        stadiony = manager.getAllStadiony();
+        manager.addStadion(stadion);
+        kraj = "kraj";
+        count = 0;
+
+        for(Stadion s : stadiony) {
+            if(Pattern.compile(".*" + kraj + ".*").matcher(manager.getStadionById(s.getStadionId()).getStadionKraj()).matches())
+                count++;
+        }
+        stadiony = manager.getStadionByKraj(kraj);
+        assertEquals(stadiony.size(), count);
+    }
+
+    @Test
+    public void getStadionByPatternCheck() {
+        String kraj = "stadionKraj1";
+        manager.addStadion(s);
+
+        assertEquals(manager.getStadionByPattern(kraj), s);
+        kraj = "pattern";
+        assertNull(manager.getStadionByPattern(kraj));
+    }
+    
+    @Test
+    public void updateStadionCheck() {
+        List<Mecz> mecze = new ArrayList<Mecz>();
+        mecze.add(mecz);
+        stadion.setMecze(mecze);
+        manager.addStadion(stadion);
+        manager.updateStadion(stadion, stadionNazwa2, stadionKraj2, mecze);
+        assertEquals(stadionNazwa2, stadion.getStadionNazwa());
+        assertEquals(stadionKraj2, stadion.getStadionKraj());
+        assertEquals(mecze, stadion.getMecze());
+
+        List<Stadion> stadiony = manager.getAllStadiony();
+        for(Stadion s : stadiony) {
+            if(!s.equals(stadion)) {
+                assertThat(s.getStadionNazwa(), is(not(stadionNazwa2)));
+                assertThat(s.getStadionKraj(), is(not(stadionKraj2)));
+                assertThat(s.getMecze(), is(not(mecze)));
+            }
+        }
+    }
 }
